@@ -1,0 +1,84 @@
+{
+  "canonical_archive_sha256": "594a1995978585823b4d8d0cada9f77824fb2763c1c8edc670f35604e9ebe58c",
+  "commit": "65ff88e8d8e7ded68bd0e98758396c3245a92871",
+  "config_bytes_unchanged": true,
+  "ordinary_wheel_sha256": "f48ec769124502302e0cc12120073834989b1f924e687adb3c05d33cc3f02c89",
+  "probe_exit": 1,
+  "probe_sha256": "26a14f25c47ebd14d4010792aa808be10e79017e247217c5b57d49a35b94f9b8",
+  "product_result": {
+    "commands": [
+      {
+        "error_is_input_cap": false,
+        "operation": "propose",
+        "returncode": 0,
+        "status": "OPTIMAL",
+        "stderr_bytes": 0,
+        "stdout_bytes": 388
+      },
+      {
+        "error_is_input_cap": false,
+        "operation": "apply",
+        "returncode": 0,
+        "status": null,
+        "stderr_bytes": 0,
+        "stdout_bytes": 262
+      },
+      {
+        "error_is_input_cap": true,
+        "operation": "check",
+        "returncode": 2,
+        "status": "INVALID",
+        "stderr_bytes": 60,
+        "stdout_bytes": 0
+      }
+    ],
+    "constraints_bytes": 86,
+    "model_counts": {
+      "actions": 500,
+      "edits": 0,
+      "grants": 1000,
+      "principals": 1,
+      "requests": 500,
+      "resources": 1,
+      "roles": 0
+    },
+    "passed": false,
+    "proposal_bytes": 388,
+    "repaired_bytes": 8708674,
+    "repaired_sha256": "21610919bd2dbae36cccbc6bf7a9fe6a0624b55e0af655c6584eba58b9af490d",
+    "scope": "supported compact input, no edit or tie complexity; actual generated model consumed by registered check",
+    "source_bytes": 4106118,
+    "source_bytes_preserved": true,
+    "source_sha256": "436bac168efaa00ba945ac2abd4956ce54fc152a058e4d7cf773c07cf3c5a45d",
+    "version": "0.1.0"
+  },
+  "raw_logs_and_generated_models_excluded": true,
+  "registered_cli_probe": "repaired_file_cap_probe.py",
+  "remote_actions": false,
+  "six_git_archive_wheel_site_associations": [
+    {
+      "file": "__init__.py",
+      "sha256": "d07738ed47b0bccbfd95d86a8a1395e4001fe517b50eec173e986890bef6d8cb"
+    },
+    {
+      "file": "cli.py",
+      "sha256": "68ec144bef1009fb17438d7f807a6eb00345e755f830ffcecf380b5fb620e823"
+    },
+    {
+      "file": "engine.py",
+      "sha256": "0dc860760079cf26f684721d04b66e2f876d20efccb17b3509566ebd8b402ca3"
+    },
+    {
+      "file": "model.py",
+      "sha256": "1c8eeaf051a80723dd4990da3965605513a5a8ef1b5b3de57295a0cc78ec3b73"
+    },
+    {
+      "file": "oracle.py",
+      "sha256": "c0dd2c6cd05017b3bda3835e0152e9a81e9c7e9421ffc7233a058306d7e622ed"
+    },
+    {
+      "file": "repair.py",
+      "sha256": "9804166b670d37f4a53b3fafb94035065876aaf47f342f2797049ced89cbcc41"
+    }
+  ]
+}

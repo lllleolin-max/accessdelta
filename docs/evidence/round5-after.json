@@ -1,0 +1,129 @@
+{
+  "commit": "0b94b427d96dc61635f85ed7690c0a49fed21c46",
+  "source_tree": "e7c33c5dd0e86146ea475c1bd4ad3949388007ca",
+  "version": "0.1.1",
+  "ordinary_install": true,
+  "canonical_archive_wheel_installed_modules": [
+    {
+      "file": "__init__.py",
+      "sha256": "d07738ed47b0bccbfd95d86a8a1395e4001fe517b50eec173e986890bef6d8cb"
+    },
+    {
+      "file": "cli.py",
+      "sha256": "755d2698f58eefdc941743fcaf33d969a06a0370223233fedccff039777ba803"
+    },
+    {
+      "file": "engine.py",
+      "sha256": "0dc860760079cf26f684721d04b66e2f876d20efccb17b3509566ebd8b402ca3"
+    },
+    {
+      "file": "model.py",
+      "sha256": "d6dac051a389634c83883f94ecccd5562bd6cd9ac5cd05f77fee9a468883fa4c"
+    },
+    {
+      "file": "oracle.py",
+      "sha256": "c0dd2c6cd05017b3bda3835e0152e9a81e9c7e9421ffc7233a058306d7e622ed"
+    },
+    {
+      "file": "repair.py",
+      "sha256": "88b34993b6b66ecca828078f7c7fd0fd10a7dd5be39b43f29a47c62e66dfb6ca"
+    }
+  ],
+  "archive_sha256": "1606f88b2fa542d2e9091b4952461172a0240f42fa1c2c42abe4f3e20e5f51bd",
+  "wheel_sha256": "29145e0bc67f0dd78d0318e98f016273ac95de1de6cf22a2f1bc343b853fcc57",
+  "unchanged_probe_sha256": "1685fac6fcfa243efbb919cbc560542fb27a45b618753986039035025027367b",
+  "probe_exit": 0,
+  "source_repository_configuration_unchanged": true,
+  "consumer": {
+    "version": "0.1.1",
+    "passed": true,
+    "records": [
+      {
+        "edits": 12,
+        "identifier_characters": 99,
+        "declared_request_count": 2,
+        "max_candidates": 4096,
+        "independent_feasible_zero_cost_subset_count": 4096,
+        "sdk_status": "OPTIMAL",
+        "sdk_apply_and_check_feasible": true,
+        "model_bytes": 2927,
+        "constraints_bytes": 1806,
+        "proposal_bytes": 2687392,
+        "proposal_sha256": "c87ef8dbbad5026dd50c703a494ac805d89fe9b2c60ae559d6d8909778a5bdb1",
+        "cli_status": "OPTIMAL",
+        "cli_complete": true,
+        "cli_tied_subset_count": 4096,
+        "commands": [
+          {
+            "operation": "propose",
+            "exit": 0,
+            "stdout_bytes": 2687392,
+            "stderr_bytes": 0,
+            "error": null
+          },
+          {
+            "operation": "apply",
+            "exit": 0,
+            "stdout_bytes": 269,
+            "stderr_bytes": 0,
+            "error": null
+          },
+          {
+            "operation": "check",
+            "exit": 0,
+            "stdout_bytes": 205,
+            "stderr_bytes": 0,
+            "error": null
+          }
+        ],
+        "proposal_consumed_by_apply_and_check": true,
+        "destination_created": true,
+        "source_bytes_preserved": true
+      },
+      {
+        "edits": 14,
+        "identifier_characters": 99,
+        "declared_request_count": 2,
+        "max_candidates": 16384,
+        "independent_feasible_zero_cost_subset_count": 16384,
+        "sdk_status": "UNKNOWN",
+        "sdk_apply_and_check_feasible": true,
+        "model_bytes": 3365,
+        "constraints_bytes": 2084,
+        "proposal_bytes": 4193764,
+        "proposal_sha256": "057367df0b8e1215c18aee75bdfc82fc2fcd01d9883ccc6274ce34560cd6318b",
+        "cli_status": "UNKNOWN",
+        "cli_complete": false,
+        "cli_tied_subset_count": 7193,
+        "commands": [
+          {
+            "operation": "propose",
+            "exit": 3,
+            "stdout_bytes": 4193764,
+            "stderr_bytes": 0,
+            "error": null
+          },
+          {
+            "operation": "apply",
+            "exit": 0,
+            "stdout_bytes": 269,
+            "stderr_bytes": 0,
+            "error": null
+          },
+          {
+            "operation": "check",
+            "exit": 0,
+            "stdout_bytes": 205,
+            "stderr_bytes": 0,
+            "error": null
+          }
+        ],
+        "proposal_consumed_by_apply_and_check": true,
+        "destination_created": true,
+        "source_bytes_preserved": true
+      }
+    ],
+    "scope": "finite legal irrelevant zero-cost deletions; no external accounts; SDK correctness versus successful CLI report consumption distinguished"
+  },
+  "remote_actions": false
+}

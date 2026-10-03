@@ -4,6 +4,8 @@ Review a **fully enumerated internal authorization model**, explain effective-ac
 
 内部应用角色变更审查工具：比较完整有效权限、查看允许/拒绝及继承证据，给出保留必要权限的最小成本删除方案，再检查实际输出的新 JSON。它只认识声明的 principal/action/resource 有限模型。
 
+Version 0.1.1 corrects two independently reproduced 0.1.0 CLI producer/consumer failures: oversized tied proposals and pretty-printed repaired files. Proposal search now also stops honestly at a wire-byte budget; repaired models use compact UTF-8. The old failures and their review receipts remain recorded in [iteration evidence](docs/ITERATIONS.md).
+
 An inherited DENY can disappear when a membership or role edge is removed. An independent ALLOW then becomes effective. AccessDelta therefore reevaluates every entire candidate model instead of treating repair as monotone grant-path cutting.
 
 ## Install and run / 安装与使用
@@ -20,7 +22,9 @@ python scripts/run_probes.py
 
 `demo.py` discovers the **installed, registered** `accessdelta` entry point through `sysconfig.get_path('scripts')`, then actually compares, inspects, proposes, applies into a new temporary local JSON, rechecks it, and independently certifies the small optimum. It prints each machine-readable result. Installation is ordinary wheel installation; no `PYTHONPATH` or source import injection.
 
-For retained files, run the same workflow (write CLI output as UTF-8 JSON; PowerShell users should use `Set-Content -Encoding utf8`):
+For retained files, run the same workflow. Preserve proposal stdout bytes exactly: an extra BOM, newline or shell text conversion can push a near-limit report above the 4 MiB reader cap. The installed-console demo captures bytes directly and is portable across supported shells.
+
+The following redirection example assumes a shell that preserves native stdout bytes.
 
 ```sh
 accessdelta compare examples/deny-diamond/before.json examples/deny-diamond/after.json
@@ -44,7 +48,7 @@ from accessdelta import Model, compare, explain, propose, apply, check, certify
 source = Model.from_dict(json.load(open('examples/deny-diamond/after.json')))
 rules = json.load(open('examples/deny-diamond/constraints.json'))
 decision = explain(source, ('alice', 'read', 'secret'))
-plan = propose(source, rules, max_candidates=65536)
+plan = propose(source, rules, max_candidates=65536, max_report_bytes=4 * 1024 * 1024)
 if plan['selected'] is not None:
     repaired = apply(source, rules, plan)
     assert check(source, rules, plan, repaired)['feasible']
@@ -76,13 +80,15 @@ AWS already provides [custom checks for new access](https://docs.aws.amazon.com/
 - Request universe: Cartesian product of supplied principals/actions/resources, at most 25,000 triples. Each declared list has at most 1,000 items. Comparison requires the same request universe on both sides.
 - CLI JSON inputs are UTF-8 (optional BOM), at most 4 MiB each. Duplicate object keys, nonfinite constants, bad encoding and unpaired Unicode surrogates are rejected.
 - Editable universe: at most 20 declared grant/membership/inheritance deletions with exact nonnegative integer costs; protected items cannot be deleted. Constraints apply to **every** declared forbidden request, including access created by removal. Required access must be effective afterward.
-- Enumeration stops at `max_candidates` (default 65,536). Exhaustion returns **UNKNOWN**, with a feasible incumbent when found, lower bound 0 and incomplete alternatives. Only complete enumeration returns OPTIMAL or INFEASIBLE. A valid incumbent can be applied and checked without proving optimality.
-- All minimum-cost subsets are reported in deterministic lexical order. Zero-cost redundant edits remain legitimate tied solutions; selected is a presentation choice, never a uniqueness claim.
+- Search stops at `max_candidates` (default 65,536) or the proposal wire budget (default 4 MiB, including its single LF). Either bound returns **UNKNOWN**, with a feasible incumbent when found, lower bound 0 and incomplete alternatives. `termination` identifies COMPLETE, MAX_CANDIDATES or MAX_REPORT_BYTES. Only complete enumeration returns OPTIMAL or INFEASIBLE. A valid incumbent can be applied and checked without proving optimality.
+- Completed results report all minimum-cost subsets in deterministic lexical order. Bounded results report known tied incumbents with `ties_complete: false`; they never claim all optimal ties. Zero-cost redundant edits remain legitimate tied solutions; selected is a presentation choice, never a uniqueness claim.
+- CLI `--max-report-bytes` may lower the proposal budget but cannot exceed the unchanged 4 MiB input cap. Encoded lengths are accounted before retaining another tie, conservatively reserving result metadata. SDK callers may explicitly choose `max_report_bytes=None` for unbounded output, which can be exponential and has no CLI-consumption guarantee.
+- `apply` writes compact canonical UTF-8 without a trailing newline. It checks the output byte cap before exclusive file creation; existing destinations are never overwritten and missing parent directories are never created. An exactly 4 MiB repaired model remains readable.
 - Independent closure/bitmask oracle: at most 12 edits, 24 roles, 256 requests. It recomputes feasibility, optimum and ties without the production evaluator or subset iteration. Parsing is shared, so its independence does not certify the parser.
 
 CLI: exit 0 for completed reports/valid operation, 2 INVALID input or I/O, 3 UNKNOWN unsupported semantics or exhausted search, 4 proven INFEASIBLE or failed optimum certification. JSON goes to stdout; errors to stderr. No timestamps are used to fake verification dates.
 
-All CLI reports, errors and help use **ASCII-safe JSON**, which is valid UTF-8 and works with legacy Windows pipes without `PYTHONUTF8` or `PYTHONIOENCODING`. JSON decoding restores the original Unicode identifiers and values; model fingerprints and UTF-8 output files retain their existing semantics. Argument errors also return JSON with exit 2. Actual registered-console tests run every operation and Unicode error paths in both `PYTHONUTF8=0` and `1`.
+All CLI reports, errors and help use **ASCII-safe JSON**, which is valid UTF-8 and works with legacy Windows pipes without `PYTHONUTF8` or `PYTHONIOENCODING`. Binary stdout/stderr emission appends exactly one LF, avoiding Windows CRLF expansion at the byte boundary. JSON decoding restores the original Unicode identifiers and values; model fingerprints and UTF-8 output files retain their existing semantics. Argument errors also return JSON with exit 2. Actual registered-console tests run every operation and Unicode error paths in both `PYTHONUTF8=0` and `1`, and consume exact near-cap stdout bytes in both modes.
 
 The former `00c207a` build failed an independent frozen Unicode pipe probe and remains rejected; its scores do not transfer to this correction. The current tracked historical receipts replace local absolute path prefixes with portable markers after preserving original bytes in a private Git-external backup. Numeric representations, outcomes, timing observations, SHAs and probe hashes remain intact. **Old Git history still contains machine paths**; history and frozen independent review assets were not rewritten. See [sanitation boundaries](docs/SANITATION.md).
 

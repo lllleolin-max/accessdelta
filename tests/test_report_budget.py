@@ -1,5 +1,4 @@
 """Producer/consumer byte boundaries, real registered CLI, immutable sources."""
-import copy
 import json
 import os
 from pathlib import Path
@@ -69,28 +68,74 @@ class ReportByteTests(unittest.TestCase):
         budget = len(wire_json(full)) - 1
         scripts = Path(sysconfig.get_path("scripts"))
         cli = scripts / ("accessdelta.exe" if os.name == "nt" else "accessdelta")
+        for mode in (0, 1):
+            with self.subTest(utf8_mode=mode), tempfile.TemporaryDirectory() as directory:
+                folder = Path(directory)
+                source, constraints, proposal, target = (folder / f"{name}.json" for name in ("source", "constraints", "proposal", "target"))
+                source.write_bytes(canonical(model.to_dict()).encode("utf-8"))
+                constraints.write_bytes(wire_json(rules))
+                originals = (source.read_bytes(), constraints.read_bytes())
+                env = dict(os.environ)
+                env.pop("PYTHONIOENCODING", None)
+                env.pop("PYTHONPATH", None)
+                env["PYTHONUTF8"] = str(mode)
+                def call(*args):
+                    return subprocess.run([str(cli), *map(str, args)], env=env, capture_output=True, timeout=90)
+                exact = call("propose", source, constraints, "--max-report-bytes", budget + 1)
+                self.assertEqual(exact.returncode, 0)
+                self.assertEqual(exact.stdout, wire_json(full))
+                self.assertEqual(len(exact.stdout), budget + 1)
+                self.assertTrue(exact.stdout.endswith(b"\n"))
+                self.assertFalse(exact.stdout.endswith(b"\r\n"))
+                planned = call("propose", source, constraints, "--max-report-bytes", budget)
+                self.assertEqual(planned.returncode, 3)
+                self.assertEqual(planned.stderr, b"")
+                self.assertLessEqual(len(planned.stdout), budget)
+                self.assertEqual(json.loads(planned.stdout)["termination"], "MAX_REPORT_BYTES")
+                proposal.write_bytes(planned.stdout)
+                self.assertEqual(call("apply", source, constraints, proposal, target).returncode, 0)
+                self.assertEqual(call("check", source, constraints, proposal, target).returncode, 0)
+                sentinel = b"existing destination must remain"
+                target.write_bytes(sentinel)
+                self.assertEqual(call("apply", source, constraints, proposal, target).returncode, 2)
+                self.assertEqual(target.read_bytes(), sentinel)
+                self.assertEqual((source.read_bytes(), constraints.read_bytes()), originals)
+                self.assertEqual(call("propose", source, constraints, "--max-report-bytes", MAX_JSON_BYTES + 1).returncode, 2)
+
+    def test_default_large_cli_ties_legacy_and_utf8_pipe_modes(self):
+        model, rules = irrelevant(count=14)
+        scripts = Path(sysconfig.get_path("scripts"))
+        cli = scripts / ("accessdelta.exe" if os.name == "nt" else "accessdelta")
+        reports = []
         with tempfile.TemporaryDirectory() as directory:
             folder = Path(directory)
-            source, constraints, proposal, target = (folder / f"{name}.json" for name in ("source", "constraints", "proposal", "target"))
+            source, constraints = folder / "source.json", folder / "constraints.json"
             source.write_bytes(canonical(model.to_dict()).encode("utf-8"))
             constraints.write_bytes(wire_json(rules))
-            originals = (source.read_bytes(), constraints.read_bytes())
-            def call(*args):
-                return subprocess.run([str(cli), *map(str, args)], capture_output=True, timeout=90)
-            planned = call("propose", source, constraints, "--max-report-bytes", budget)
-            self.assertEqual(planned.returncode, 3)
-            self.assertEqual(planned.stderr, b"")
-            self.assertLessEqual(len(planned.stdout), budget)
-            self.assertEqual(json.loads(planned.stdout)["termination"], "MAX_REPORT_BYTES")
-            proposal.write_bytes(planned.stdout)
-            self.assertEqual(call("apply", source, constraints, proposal, target).returncode, 0)
-            self.assertEqual(call("check", source, constraints, proposal, target).returncode, 0)
-            sentinel = b"existing destination must remain"
-            target.write_bytes(sentinel)
-            self.assertEqual(call("apply", source, constraints, proposal, target).returncode, 2)
-            self.assertEqual(target.read_bytes(), sentinel)
-            self.assertEqual((source.read_bytes(), constraints.read_bytes()), originals)
-            self.assertEqual(call("propose", source, constraints, "--max-report-bytes", MAX_JSON_BYTES + 1).returncode, 2)
+            original = source.read_bytes()
+            for mode in (0, 1):
+                env = dict(os.environ)
+                env.pop("PYTHONIOENCODING", None)
+                env.pop("PYTHONPATH", None)
+                env["PYTHONUTF8"] = str(mode)
+                def call(*args):
+                    return subprocess.run([str(cli), *map(str, args)], env=env, capture_output=True, timeout=90)
+                planned = call("propose", source, constraints, "--max-candidates", 16384)
+                self.assertEqual(planned.returncode, 3)
+                self.assertLessEqual(len(planned.stdout), MAX_JSON_BYTES)
+                self.assertGreater(len(planned.stdout), MAX_JSON_BYTES - 3000)
+                report = json.loads(planned.stdout)
+                self.assertEqual(report["termination"], "MAX_REPORT_BYTES")
+                self.assertFalse(report["ties_complete"])
+                self.assertEqual(wire_json(report), planned.stdout)
+                self.assertFalse(planned.stdout.endswith(b"\r\n"))
+                reports.append(planned.stdout)
+                proposal, target = folder / f"proposal-{mode}.json", folder / f"target-{mode}.json"
+                proposal.write_bytes(planned.stdout)
+                self.assertEqual(call("apply", source, constraints, proposal, target).returncode, 0)
+                self.assertEqual(call("check", source, constraints, proposal, target).returncode, 0)
+                self.assertEqual(source.read_bytes(), original)
+            self.assertEqual(reports[0], reports[1])
 
     def test_exact_cap_model_output_without_added_lf_and_refusal_before_allocation(self):
         actions = [f"a{i:04d}" for i in range(500)]
