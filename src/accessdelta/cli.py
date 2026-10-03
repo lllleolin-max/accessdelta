@@ -6,6 +6,20 @@ import sys
 from . import Model, ModelError, UnsupportedModel, compare, explain, propose, apply, check, certify
 
 
+def emit(value, file=None):
+    # ASCII is valid UTF-8 and is encodable by legacy Windows pipe codecs.
+    # JSON escapes change only wire representation, never identifiers/values.
+    print(json.dumps(value, ensure_ascii=True, sort_keys=True), file=file or sys.stdout)
+
+
+class JSONArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise ModelError("arguments: " + message)
+
+    def print_help(self, file=None):
+        emit({"help": self.format_help()}, file)
+
+
 def read(path):
     def unique_object(pairs):
         obj = {}
@@ -31,7 +45,7 @@ def load(path):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog="accessdelta")
+    parser = JSONArgumentParser(prog="accessdelta")
     commands = parser.add_subparsers(dest="command", required=True)
     p = commands.add_parser("compare")
     p.add_argument("before")
@@ -54,8 +68,8 @@ def main(argv=None):
             p.add_argument("output")
         if name == "check":
             p.add_argument("repaired")
-    args = parser.parse_args(argv)
     try:
+        args = parser.parse_args(argv)
         if args.command == "compare":
             result = compare(load(args.before), load(args.after))
         elif args.command == "inspect":
@@ -75,17 +89,17 @@ def main(argv=None):
                 result = check(source, constraints, proposal, load(args.repaired))
             else:
                 result = certify(source, constraints, proposal)
-        print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+        emit(result)
         if result.get("status") == "UNKNOWN":
             return 3
         if result.get("status") == "INFEASIBLE" or result.get("certified") is False:
             return 4
         return 0
     except UnsupportedModel as exc:
-        print(json.dumps({"status": "UNKNOWN", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
+        emit({"status": "UNKNOWN", "error": str(exc)}, sys.stderr)
         return 3
     except (ModelError, OSError, json.JSONDecodeError) as exc:
-        print(json.dumps({"status": "INVALID", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
+        emit({"status": "INVALID", "error": str(exc)}, sys.stderr)
         return 2
 
 
