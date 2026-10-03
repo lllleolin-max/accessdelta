@@ -82,4 +82,8 @@ AWS already provides [custom checks for new access](https://docs.aws.amazon.com/
 
 CLI: exit 0 for completed reports/valid operation, 2 INVALID input or I/O, 3 UNKNOWN unsupported semantics or exhausted search, 4 proven INFEASIBLE or failed optimum certification. JSON goes to stdout; errors to stderr. No timestamps are used to fake verification dates.
 
+All CLI reports, errors and help use **ASCII-safe JSON**, which is valid UTF-8 and works with legacy Windows pipes without `PYTHONUTF8` or `PYTHONIOENCODING`. JSON decoding restores the original Unicode identifiers and values; model fingerprints and UTF-8 output files retain their existing semantics. Argument errors also return JSON with exit 2. Actual registered-console tests run every operation and Unicode error paths in both `PYTHONUTF8=0` and `1`.
+
+The former `00c207a` build failed an independent frozen Unicode pipe probe and remains rejected; its scores do not transfer to this correction. The current tracked historical receipts replace local absolute path prefixes with portable markers after preserving original bytes in a private Git-external backup. Numeric representations, outcomes, timing observations, SHAs and probe hashes remain intact. **Old Git history still contains machine paths**; history and frozen independent review assets were not rewritten. See [sanitation boundaries](docs/SANITATION.md).
+
 See [architecture](docs/ARCHITECTURE.md), [bounded commercial rationale](docs/COMMERCIAL.md), [iteration evidence](docs/ITERATIONS.md), [security](SECURITY.md), and [contributing](CONTRIBUTING.md). GitHub Actions declares Ubuntu/Windows × Python 3.11/3.14; a checked-in matrix is not evidence of remote execution.

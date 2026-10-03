@@ -12,6 +12,8 @@ Let P be principals, R roles, E inheritance/membership edges, G grants, U = P×a
 
 CLI parsing rejects duplicate JSON keys instead of accepting last-value-wins authorization fields. Only absent/empty-object conditions are unconditional; false/null/arrays/numbers/strings do not erase restrictions. Input size is 4 MiB, UTF-8 with optional BOM. Invalid proposal shapes, costs, accounting, source bindings and inconsistent status/completeness are rejected before application. The independent checker shares these parser guards, so separate wire probes remain necessary.
 
+CLI wire serialization uses JSON's ASCII escaping for all stdout/stderr reports and help. This avoids encoding failures when Windows pipes select a legacy codec, while decoding restores exact Unicode values. Model canonicalization and local output-file UTF-8 bytes remain separate from console escaping. Argument-parser errors are translated into structured INVALID JSON (exit 2); no user encoding environment settings are required. Tests explicitly reset those settings for actual registered-console operations rather than relying on helper capture encoding.
+
 Full-tie output can approach 2^K when all costs are zero and many subsets are feasible. Deterministic presentation does not assert that only one repair exists. The exhaustive oracle's 12-edit cap makes independent certification an offline small-case tool, not an unrestricted large repair checker.
 
 Threat boundary: model JSON is untrusted, local files are user-selected, and permissions are declarations. No network calls or shell authorization commands occur in the library/CLI. Package/example scripts use subprocess solely to invoke installed local CLI/test/build tools.

@@ -1,0 +1,62 @@
+{
+  "scope": "current seven receipts only; history and frozen independent review assets unchanged",
+  "backup": "<PUBLICATION_PRIVATE>/accessdelta/raw-evidence-fe81a4931fa444f787f118898cffc7db",
+  "files": [
+    {
+      "file": "round1-after.json",
+      "original_sha256": "5b201cd38f6b6d0ed69cc3f48d22ffa3960f9a299496a9ebcd66c488ada971f2",
+      "current_sha256": "6188603a5b7780bdb775e855a0b44bb7657dad243babf6f069703b894f44d394",
+      "original_backup_hash_matches": true,
+      "only_portable_leaf_strings_changed": true,
+      "nonstring_lexical_bytes_unchanged": true
+    },
+    {
+      "file": "round1-before-decoding-failure.json",
+      "original_sha256": "1c5288576dc074fe105a123adf40da5d297fb3435cc40702517410b058ca2bb6",
+      "current_sha256": "825b6414793b0abeb4aff85f9c9e723c62bddc50cd093e38b0dbd8c71a0c901f",
+      "original_backup_hash_matches": true,
+      "only_portable_leaf_strings_changed": true,
+      "nonstring_lexical_bytes_unchanged": true
+    },
+    {
+      "file": "round1-before.json",
+      "original_sha256": "bfdbab26d577bb8f4ca7ba3d9410e0de6fe8c36eef663edf3c67e3a726d33a5e",
+      "current_sha256": "a98a06d4dd61b045895d2d8ea79657d5118b65e84f230bd415fb507f1e5f3fc6",
+      "original_backup_hash_matches": true,
+      "only_portable_leaf_strings_changed": true,
+      "nonstring_lexical_bytes_unchanged": true
+    },
+    {
+      "file": "round2-after.json",
+      "original_sha256": "59aa1df9b39dc718d4e7b5c820f08f40be8958f91e139a966e9aa7896b5e63d4",
+      "current_sha256": "8276ec102f6da9886c68dfe40c277d69e831705b8399ae82e1e9d816ce8b2eb1",
+      "original_backup_hash_matches": true,
+      "only_portable_leaf_strings_changed": true,
+      "nonstring_lexical_bytes_unchanged": true
+    },
+    {
+      "file": "round2-before.json",
+      "original_sha256": "a9c038e21ceaf361a2832c635adbdaca24dcf8ab7a893b0c47cdacb37f8441e5",
+      "current_sha256": "ee1f4b9e935f1e568705ee262ef9d60bff263740513c3ce13a47724db5bf8970",
+      "original_backup_hash_matches": true,
+      "only_portable_leaf_strings_changed": true,
+      "nonstring_lexical_bytes_unchanged": true
+    },
+    {
+      "file": "round3-after.json",
+      "original_sha256": "dbc96cbdc3af9a9715f3928834e85d3650bee25f098ad7a8591f0edcd39f743b",
+      "current_sha256": "0bae1ce4e71c3989819531dfa21b6712aac7d566eda441e90e2726a3749055b5",
+      "original_backup_hash_matches": true,
+      "only_portable_leaf_strings_changed": true,
+      "nonstring_lexical_bytes_unchanged": true
+    },
+    {
+      "file": "round3-before.json",
+      "original_sha256": "73ca3b76ec44f26083efabbc70be2627bcaf59f189fa6840898dbfe0f90839e1",
+      "current_sha256": "409c3cd3cce2661620481e1d6149b8e32989d98c6af3cf0e2eb332747439f27f",
+      "original_backup_hash_matches": true,
+      "only_portable_leaf_strings_changed": true,
+      "nonstring_lexical_bytes_unchanged": true
+    }
+  ]
+}

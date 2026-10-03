@@ -52,3 +52,20 @@ python scripts/verify_revision.py f24cd5c6e7ea07a6aebd0d5934d963e3339058b6 --pro
 ```
 
 Remaining boundaries: finite declared identities/actions/resources only; deletion-only edits; exhaustive search remains exponential; caps bound work counts rather than runtime; tied zero-cost output can be large; optimum oracle is small-instance only; local Windows Python 3.14 verification does not prove remote Ubuntu/Windows Python 3.11/3.14 CI passed. Independent review may veto the artifact and no builder scores are asserted.
+
+## 4 — independently rejected Unicode console encoding
+
+The immutable independent review at `00c207aec0836c5f1f53f6fb0cc6827600a9a2f6` was FAIL/HOLD (60/60/71), after its registered CLI crashed for the admitted principal `user-😀` on Windows legacy GBK pipes. That failure and independent review assets remain frozen; those scores do not describe or certify any corrected commit. The first three rounds above still await the reviewer's own runtime replay.
+
+Builder replay used the original unchanged independent `cli_unicode_probe.py`, SHA256 `fbcd865c9cded52ee28890623c734928c3c4fc3f19198fcf43839129714bb830`. A fresh ordinary archive wheel of the old exact SHA matched all six Git/archive/wheel/site modules and reproduced probe exit 1, product exit 1, UnicodeEncodeError and no JSON. Its actual full suite still had 23 passing tests. [Old failure receipt](evidence/round4-before.json).
+
+Direct parent → substantive product fix child: `00c207aec0836c5f1f53f6fb0cc6827600a9a2f6` → `4f53c5b908d72205bc3dd40e8bddc7b44457f0e5`. `cli.py` now serializes all stdout/stderr JSON with ASCII escaping, preserving decoded values and SDK/model identity. Argument errors are structured INVALID JSON and help is JSON. No user UTF-8 environment setting is needed. The new real registered-console tests run compare/inspect/propose/apply/check/certify, unsupported and bounded statuses, Unicode errors/filenames and argument errors under both forced legacy and UTF-8 modes.
+
+The same original probe on the direct child wheel returns 0, ALLOW JSON, no UnicodeEncodeError and PASS. The actual child suite has 25 passing tests; full demo, contrast and original three frozen probes also pass. [Child receipt](evidence/round4-after.json). Later supplementary Unicode error assertions and the byte-identical public probe copy do not count as another application correction round.
+
+```sh
+python scripts/verify_revision.py 00c207aec0836c5f1f53f6fb0cc6827600a9a2f6 --probe tests/probes/cli_unicode_probe.py --output artifacts/replay-r4-before.json
+python scripts/verify_revision.py 4f53c5b908d72205bc3dd40e8bddc7b44457f0e5 --probe tests/probes/cli_unicode_probe.py --output artifacts/replay-r4-after.json
+```
+
+The public probe copy preserves the original frozen bytes/hash and attribution; independent assets outside this repository were never modified. Helper UTF-8 capture only encodes the harness; the probe removes encoding overrides and explicitly resets its product subprocess to `PYTHONUTF8=0`. Helper improvements and current-document path sanitation are not counted as code iterations. [Sanitation evidence and history boundary](SANITATION.md).

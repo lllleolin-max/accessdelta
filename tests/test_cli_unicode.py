@@ -88,9 +88,21 @@ class UnicodePipeTests(unittest.TestCase):
                 source.write_text(json.dumps(policy(), ensure_ascii=False), encoding="utf-8")
                 rules.write_text(json.dumps(constraints(), ensure_ascii=False), encoding="utf-8")
                 invalid.write_text('{"key-\U0001f600":1,"key-\U0001f600":2}', encoding="utf-8")
-                error = self.run_cli(mode, 2, "stderr", "inspect", invalid, PRINCIPAL, ACTION, RESOURCE)
-                self.assertEqual(error["status"], "INVALID")
-                self.assertIn("key-\U0001f600", error["error"])
+                for args in (("compare", invalid, source), ("inspect", invalid, PRINCIPAL, ACTION, RESOURCE), ("propose", invalid, rules), ("apply", invalid, rules, rules, source), ("check", invalid, rules, rules, source), ("certify", invalid, rules, rules)):
+                    error = self.run_cli(mode, 2, "stderr", *args)
+                    self.assertEqual(error["status"], "INVALID")
+                    self.assertIn("key-\U0001f600", error["error"])
+                plan = self.run_cli(mode, 0, "stdout", "propose", source, rules)
+                proposal = folder / "proposal-\U0001f600.json"
+                proposal.write_text(json.dumps(plan, ensure_ascii=False), encoding="utf-8")
+                original = source.read_bytes()
+                error = self.run_cli(mode, 2, "stderr", "apply", source, rules, proposal, source)
+                self.assertIn(source.name, error["error"])
+                self.assertEqual(source.read_bytes(), original)
+                self.run_cli(mode, 2, "stderr", "check", source, rules, proposal, source)
+                plan["cost"] = 2
+                proposal.write_text(json.dumps(plan, ensure_ascii=False), encoding="utf-8")
+                self.assertIs(self.run_cli(mode, 4, "stdout", "certify", source, rules, proposal)["certified"], False)
                 missing = folder / "missing-\U0001f600.json"
                 error = self.run_cli(mode, 2, "stderr", "inspect", missing, PRINCIPAL, ACTION, RESOURCE)
                 self.assertIn("missing-\U0001f600.json", error["error"])
