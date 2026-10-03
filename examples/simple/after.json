@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "principals": [
+    "alice"
+  ],
+  "roles": [],
+  "actions": [
+    "read",
+    "write"
+  ],
+  "resources": [
+    "report",
+    "deploy",
+    "secret"
+  ],
+  "memberships": [],
+  "inheritance": [],
+  "grants": [
+    {
+      "id": "required",
+      "subject": {
+        "kind": "principal",
+        "id": "alice"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "read"
+      ],
+      "resources": [
+        "report"
+      ]
+    },
+    {
+      "id": "unwanted",
+      "subject": {
+        "kind": "principal",
+        "id": "alice"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "write"
+      ],
+      "resources": [
+        "deploy"
+      ]
+    }
+  ]
+}

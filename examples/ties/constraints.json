@@ -1,0 +1,33 @@
+{
+  "required": [],
+  "forbidden": [
+    [
+      "alice",
+      "write",
+      "deploy"
+    ]
+  ],
+  "edits": [
+    {
+      "kind": "membership",
+      "id": "join",
+      "cost": 2
+    },
+    {
+      "kind": "grant",
+      "id": "one",
+      "cost": 1
+    },
+    {
+      "kind": "grant",
+      "id": "two",
+      "cost": 1
+    },
+    {
+      "kind": "grant",
+      "id": "irrelevant",
+      "cost": 0
+    }
+  ],
+  "protected": []
+}

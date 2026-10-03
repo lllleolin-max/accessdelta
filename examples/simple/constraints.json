@@ -1,0 +1,26 @@
+{
+  "required": [
+    [
+      "alice",
+      "read",
+      "report"
+    ]
+  ],
+  "forbidden": [
+    [
+      "alice",
+      "write",
+      "deploy"
+    ]
+  ],
+  "edits": [
+    {
+      "kind": "grant",
+      "id": "unwanted",
+      "cost": 2
+    }
+  ],
+  "protected": [
+    "grant:required"
+  ]
+}

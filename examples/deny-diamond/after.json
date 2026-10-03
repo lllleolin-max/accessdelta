@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "principals": [
+    "alice"
+  ],
+  "roles": [
+    "entry",
+    "allow-branch",
+    "deny-branch",
+    "common"
+  ],
+  "actions": [
+    "read",
+    "write"
+  ],
+  "resources": [
+    "report",
+    "deploy",
+    "secret"
+  ],
+  "memberships": [
+    {
+      "id": "entry-member",
+      "principal": "alice",
+      "role": "entry"
+    }
+  ],
+  "inheritance": [
+    {
+      "id": "allow-edge",
+      "role": "entry",
+      "inherits": "allow-branch"
+    },
+    {
+      "id": "deny-edge",
+      "role": "entry",
+      "inherits": "deny-branch"
+    },
+    {
+      "id": "allow-common",
+      "role": "allow-branch",
+      "inherits": "common"
+    },
+    {
+      "id": "deny-common",
+      "role": "deny-branch",
+      "inherits": "common"
+    }
+  ],
+  "grants": [
+    {
+      "id": "read-required",
+      "subject": {
+        "kind": "principal",
+        "id": "alice"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "read"
+      ],
+      "resources": [
+        "report"
+      ]
+    },
+    {
+      "id": "alternate-secret",
+      "subject": {
+        "kind": "principal",
+        "id": "alice"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "read"
+      ],
+      "resources": [
+        "secret"
+      ]
+    },
+    {
+      "id": "common-secret",
+      "subject": {
+        "kind": "role",
+        "id": "common"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "read"
+      ],
+      "resources": [
+        "secret"
+      ]
+    },
+    {
+      "id": "deny-secret",
+      "subject": {
+        "kind": "role",
+        "id": "deny-branch"
+      },
+      "effect": "DENY",
+      "actions": [
+        "read"
+      ],
+      "resources": [
+        "secret"
+      ]
+    },
+    {
+      "id": "bad-write",
+      "subject": {
+        "kind": "role",
+        "id": "deny-branch"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "write"
+      ],
+      "resources": [
+        "deploy"
+      ]
+    }
+  ]
+}

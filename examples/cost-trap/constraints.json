@@ -1,0 +1,47 @@
+{
+  "required": [
+    [
+      "alice",
+      "read",
+      "report"
+    ]
+  ],
+  "forbidden": [
+    [
+      "alice",
+      "write",
+      "deploy"
+    ],
+    [
+      "alice",
+      "read",
+      "secret"
+    ]
+  ],
+  "edits": [
+    {
+      "kind": "grant",
+      "id": "deploy-write",
+      "cost": 2
+    },
+    {
+      "kind": "grant",
+      "id": "secret-read",
+      "cost": 2
+    },
+    {
+      "kind": "inheritance",
+      "id": "write-edge",
+      "cost": 3
+    },
+    {
+      "kind": "membership",
+      "id": "alice-entry",
+      "cost": 1
+    }
+  ],
+  "protected": [
+    "grant:read-required",
+    "inheritance:read-edge"
+  ]
+}

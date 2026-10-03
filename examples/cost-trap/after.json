@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "principals": [
+    "alice"
+  ],
+  "roles": [
+    "entry",
+    "reader",
+    "writer"
+  ],
+  "actions": [
+    "read",
+    "write"
+  ],
+  "resources": [
+    "report",
+    "deploy",
+    "secret"
+  ],
+  "memberships": [
+    {
+      "id": "alice-entry",
+      "principal": "alice",
+      "role": "entry"
+    }
+  ],
+  "inheritance": [
+    {
+      "id": "read-edge",
+      "role": "entry",
+      "inherits": "reader"
+    },
+    {
+      "id": "write-edge",
+      "role": "entry",
+      "inherits": "writer"
+    }
+  ],
+  "grants": [
+    {
+      "id": "read-required",
+      "subject": {
+        "kind": "role",
+        "id": "reader"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "read"
+      ],
+      "resources": [
+        "report"
+      ]
+    },
+    {
+      "id": "deploy-write",
+      "subject": {
+        "kind": "role",
+        "id": "writer"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "write"
+      ],
+      "resources": [
+        "deploy"
+      ]
+    },
+    {
+      "id": "secret-read",
+      "subject": {
+        "kind": "role",
+        "id": "writer"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "read"
+      ],
+      "resources": [
+        "secret"
+      ]
+    }
+  ]
+}

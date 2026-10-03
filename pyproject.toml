@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "accessdelta"
+version = "0.1.0"
+description = "Finite internal effective-access comparison and costed deletion repair"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "lllleolin-max"}]
+dependencies = []
+
+[project.scripts]
+accessdelta = "accessdelta.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "principals": [
+    "alice"
+  ],
+  "roles": [
+    "writer"
+  ],
+  "actions": [
+    "read",
+    "write"
+  ],
+  "resources": [
+    "report",
+    "deploy",
+    "secret"
+  ],
+  "memberships": [
+    {
+      "id": "join",
+      "principal": "alice",
+      "role": "writer"
+    }
+  ],
+  "inheritance": [],
+  "grants": [
+    {
+      "id": "one",
+      "subject": {
+        "kind": "role",
+        "id": "writer"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "write"
+      ],
+      "resources": [
+        "deploy"
+      ]
+    },
+    {
+      "id": "two",
+      "subject": {
+        "kind": "role",
+        "id": "writer"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "write"
+      ],
+      "resources": [
+        "deploy"
+      ]
+    },
+    {
+      "id": "irrelevant",
+      "subject": {
+        "kind": "principal",
+        "id": "alice"
+      },
+      "effect": "ALLOW",
+      "actions": [
+        "read"
+      ],
+      "resources": [
+        "report"
+      ]
+    }
+  ]
+}
