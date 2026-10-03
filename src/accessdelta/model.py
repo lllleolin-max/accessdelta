@@ -7,11 +7,13 @@ import hashlib
 import json
 
 MAX_JSON_BYTES = 4 * 1024 * 1024
+MAX_JSON_INTEGER_DIGITS = 4300
+JSON_INTEGER_LIMIT = 10 ** MAX_JSON_INTEGER_DIGITS
 
 
 def wire_json(value):
     """Exact ASCII-safe JSON protocol bytes, including one LF on every platform."""
-    return (json.dumps(value, ensure_ascii=True, sort_keys=True) + "\n").encode("ascii")
+    return (_json_text(value, ensure_ascii=True, compact=False) + "\n").encode("ascii")
 
 
 class ModelError(ValueError):
@@ -23,7 +25,49 @@ class UnsupportedModel(ModelError):
 
 
 def canonical(value):
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return _json_text(value, ensure_ascii=False, compact=True)
+
+
+def json_integer(token):
+    """Bounded exact JSON integer input, independent of global digit settings."""
+    digits = token.removeprefix("-")
+    if len(digits) > MAX_JSON_INTEGER_DIGITS:
+        raise ModelError("JSON integer exceeds 4300 decimal digits")
+    value = 0
+    for start in range(0, len(digits), 9):
+        chunk = digits[start:start + 9]
+        value = value * 10 ** len(chunk) + int(chunk)
+    return -value if token.startswith("-") else value
+
+
+def integer_fits_wire(value):
+    return -JSON_INTEGER_LIMIT < value < JSON_INTEGER_LIMIT
+
+
+def _integer_text(value):
+    if not integer_fits_wire(value):
+        raise ModelError("JSON integer exceeds 4300 decimal digits")
+    chunks = []
+    remaining = abs(value)
+    while remaining >= 1000000000:
+        remaining, chunk = divmod(remaining, 1000000000)
+        chunks.append(f"{chunk:09d}")
+    return ("-" if value < 0 else "") + str(remaining) + "".join(reversed(chunks))
+
+
+def _json_text(value, *, ensure_ascii, compact):
+    # Decimal chunks stay below interpreter conversion limits; neither codec
+    # mutates sys.int_max_str_digits. Ordinary JSON number semantics are retained.
+    comma, colon = (",", ":") if compact else (", ", ": ")
+    if type(value) is int:
+        return _integer_text(value)
+    if isinstance(value, dict):
+        if not all(isinstance(key, str) for key in value):
+            raise ModelError("JSON object keys must be strings")
+        return "{" + comma.join(json.dumps(key, ensure_ascii=ensure_ascii) + colon + _json_text(value[key], ensure_ascii=ensure_ascii, compact=compact) for key in sorted(value)) + "}"
+    if isinstance(value, (list, tuple)):
+        return "[" + comma.join(_json_text(item, ensure_ascii=ensure_ascii, compact=compact) for item in value) + "]"
+    return json.dumps(value, ensure_ascii=ensure_ascii, allow_nan=False)
 
 
 def fingerprint(value):

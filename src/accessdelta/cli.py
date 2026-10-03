@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import sys
 from . import Model, ModelError, UnsupportedModel, compare, explain, propose, apply, check, certify
-from .model import MAX_JSON_BYTES, canonical, wire_json
+from .model import MAX_JSON_BYTES, canonical, wire_json, json_integer
 
 
 def emit(value, file=None):
@@ -41,7 +41,7 @@ def read(path):
     if len(data) > MAX_JSON_BYTES:
         raise ModelError("JSON input exceeds 4 MiB")
     try:
-        return json.loads(data.decode("utf-8-sig"), object_pairs_hook=unique_object, parse_constant=no_constant)
+        return json.loads(data.decode("utf-8-sig"), object_pairs_hook=unique_object, parse_constant=no_constant, parse_int=json_integer)
     except (UnicodeError, ValueError, RecursionError) as exc:
         raise ModelError(f"invalid UTF-8 JSON: {exc}") from exc
 

@@ -1,6 +1,6 @@
 """Exact subset enumeration with honest candidate bounds and exact integer costs."""
 from itertools import combinations
-from .model import ModelError, fields, identifier, fingerprint, MAX_JSON_BYTES, wire_json
+from .model import ModelError, fields, identifier, fingerprint, MAX_JSON_BYTES, wire_json, integer_fits_wire
 from .engine import effective
 
 
@@ -39,6 +39,8 @@ def parse_constraints(model, value):
             raise ModelError("unknown or duplicate edit item")
         if type(edit["cost"]) is not int or edit["cost"] < 0:
             raise ModelError("edit cost must be an exact nonnegative integer")
+        if not integer_fits_wire(edit["cost"]):
+            raise ModelError("source edit cost exceeds 4300 decimal digits")
         edits[key] = edit["cost"]
     normalized = {"required": [list(x) for x in sorted(sets[0])], "forbidden": [list(x) for x in sorted(sets[1])], "protected": sorted(protected), "edits": [{"kind": key.split(":", 1)[0], "id": key.split(":", 1)[1], "cost": cost} for key, cost in sorted(edits.items())]}
     return sets[0], sets[1], {k: v for k, v in edits.items() if k not in protected}, normalized
@@ -82,6 +84,10 @@ def propose(model, constraints, max_candidates=65536, *, max_report_bytes=MAX_JS
             if required <= allowed and not forbidden & allowed:
                 cost = sum(edits[k] for k in subset)
                 if best_cost is None or cost <= best_cost:
+                    if max_report_bytes is not None and not integer_fits_wire(cost):
+                        complete = False
+                        termination = "MAX_INTEGER_DIGITS"
+                        break
                     lower = best_cost is None or cost < best_cost
                     subset_bytes = 2 + sum(key_bytes[k] for k in subset) + 2 * max(len(subset) - 1, 0)
                     byte_sum = subset_bytes if lower else best_bytes + subset_bytes
@@ -139,7 +145,7 @@ def validate_proposal(model, constraints, proposal):
         raise ModelError("invalid proposal status/completeness")
     if proposal["complete"] != (proposal["status"] != "UNKNOWN") or proposal["ties_complete"] != proposal["complete"]:
         raise ModelError("inconsistent proposal status/completeness")
-    if "termination" in proposal and (proposal["termination"] not in ("COMPLETE", "MAX_CANDIDATES", "MAX_REPORT_BYTES") or (proposal["termination"] == "COMPLETE") != proposal["complete"]):
+    if "termination" in proposal and (proposal["termination"] not in ("COMPLETE", "MAX_CANDIDATES", "MAX_REPORT_BYTES", "MAX_INTEGER_DIGITS") or (proposal["termination"] == "COMPLETE") != proposal["complete"]):
         raise ModelError("inconsistent proposal termination/completeness")
     total = 2 ** len(edits)
     if type(proposal["candidate_count"]) is not int or proposal["candidate_count"] != total or type(proposal["checked"]) is not int or not 0 <= proposal["checked"] <= total:
