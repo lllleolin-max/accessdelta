@@ -1,6 +1,6 @@
 """Independent small-instance oracle: Boolean closure, bitmasks, no engine calls."""
 from itertools import product
-from .model import ModelError
+from .model import ModelError, fingerprint
 from .repair import parse_constraints
 
 
@@ -43,7 +43,11 @@ def exhaustive_oracle(model, constraints):
 
 def certify(model, constraints, proposal):
     """Recompute small optimum independently; never trust proposal status/claimed ties."""
+    _, _, _, normalized = parse_constraints(model, constraints)
+    if not isinstance(proposal, dict):
+        raise ModelError("proposal must be an object")
     oracle = exhaustive_oracle(model, constraints)
     claimed = [proposal["selected"]] + proposal["alternatives"] if proposal.get("selected") is not None else []
-    valid = proposal.get("complete") is True and proposal.get("status") == oracle["status"] and proposal.get("cost") == oracle["cost"] and claimed == oracle["solutions"]
+    bound = proposal.get("model") == model.digest and proposal.get("constraints") == fingerprint(normalized)
+    valid = bound and proposal.get("complete") is True and proposal.get("ties_complete") is True and proposal.get("status") == oracle["status"] and proposal.get("cost") == oracle["cost"] and claimed == oracle["solutions"]
     return {"certified": valid, "oracle": oracle, "scope": "independent finite deletion optimum only; not cloud or outside-universe safety"}

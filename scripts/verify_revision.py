@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -16,7 +17,8 @@ def digest(data):
 
 
 def run(args, cwd):
-    process = subprocess.run([str(x) for x in args], cwd=cwd, capture_output=True, text=True, encoding="utf-8")
+    env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
+    process = subprocess.run([str(x) for x in args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
     return {"command": [str(x) for x in args], "returncode": process.returncode, "stdout": process.stdout, "stderr": process.stderr}
 
 

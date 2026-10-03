@@ -97,6 +97,14 @@ class AuthorizationTests(unittest.TestCase):
 
 
 class RepairTests(unittest.TestCase):
+    def test_certificate_binding_and_complete_ties(self):
+        model, rules = fixture("simple")
+        plan = propose(model, rules)
+        for field, value in (("model", "elsewhere"), ("constraints", "elsewhere"), ("ties_complete", False)):
+            tampered = copy.deepcopy(plan)
+            tampered[field] = value
+            self.assertFalse(certify(model, rules, tampered)["certified"])
+
     def test_ties_zero_cost(self):
         model, rules = fixture("ties")
         proposal = propose(model, rules)
