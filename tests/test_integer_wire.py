@@ -53,6 +53,11 @@ class IntegerWireTests(unittest.TestCase):
         self.assertEqual(unbounded["selected"], ["grant:g0", "grant:g1"])
         self.assertTrue(certify(model, rules, unbounded)["certified"])
         self.assertTrue(check(model, rules, unbounded, apply(model, rules, unbounded))["feasible"])
+        single, single_rules = independent_grants(count=1)
+        single_plan = propose(single, single_rules)
+        self.assertEqual(single_plan["status"], "OPTIMAL")
+        self.assertEqual(single_plan["cost"], JSON_INTEGER_LIMIT - 1)
+        self.assertTrue(certify(single, single_rules, single_plan)["certified"])
         bounded = propose(model, rules)
         self.assertEqual((bounded["status"], bounded["termination"]), ("UNKNOWN", "MAX_INTEGER_DIGITS"))
         self.assertEqual((bounded["checked"], bounded["candidate_count"]), (4, 4))
@@ -111,10 +116,10 @@ class IntegerWireTests(unittest.TestCase):
         scripts = Path(sysconfig.get_path("scripts"))
         cli = scripts / ("accessdelta.exe" if os.name == "nt" else "accessdelta")
         for mode in (0, 1):
-            for digits in (4299, 4300):
-                with self.subTest(mode=mode, digits=digits), tempfile.TemporaryDirectory() as directory:
+            for digits, count in ((4299, 2), (4300, 1), (4300, 2)):
+                with self.subTest(mode=mode, digits=digits, count=count), tempfile.TemporaryDirectory() as directory:
                     folder = Path(directory)
-                    model, rules = independent_grants(cost=10 ** digits - 1)
+                    model, rules = independent_grants(count=count, cost=10 ** digits - 1)
                     source, constraints, proposal, target = (folder / (name + ".json") for name in ("source", "constraints", "proposal", "target"))
                     source.write_bytes(canonical(model.to_dict()).encode("utf-8"))
                     constraints.write_bytes(wire_json(rules))
@@ -129,9 +134,9 @@ class IntegerWireTests(unittest.TestCase):
                     self.assertEqual(run.stdout, wire_json(plan))
                     self.assertEqual(run.stderr, b"")
                     proposal.write_bytes(run.stdout)
-                    if digits == 4299:
+                    if digits == 4299 or count == 1:
                         self.assertEqual(run.returncode, 0)
-                        self.assertEqual(plan["cost"], 2 * (10 ** digits - 1))
+                        self.assertEqual(plan["cost"], count * (10 ** digits - 1))
                         for op, tail in (("apply", [target]), ("check", [target]), ("certify", [])):
                             result = call(op, source, constraints, proposal, *tail)
                             self.assertEqual(result.returncode, 0, result.stderr)
@@ -170,6 +175,11 @@ class IntegerWireTests(unittest.TestCase):
                             self.assertNotIn(b"Traceback", refused.stderr)
                             self.assertEqual(target.read_bytes(), sentinel)
                             self.assertFalse(absent.parent.exists())
+                        for operation, tail in (("check", [target]), ("certify", [])):
+                            refused = call(operation, source, constraints, proposal, *tail)
+                            self.assertEqual(refused.returncode, 2)
+                            self.assertEqual(json.loads(refused.stderr)["status"], "INVALID")
+                            self.assertNotIn(b"Traceback", refused.stderr)
                     constraints.write_bytes(originals[1].replace(b'"cost": ' + b"9" * digits, b'"cost": 1' + b"0" * 4300, 1))
                     refused = call("propose", source, constraints)
                     self.assertEqual(refused.returncode, 2)
