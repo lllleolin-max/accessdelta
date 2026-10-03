@@ -1,6 +1,6 @@
 """Exact subset enumeration with honest candidate bounds and exact integer costs."""
 from itertools import combinations
-from .model import ModelError, fields, identifier, fingerprint
+from .model import ModelError, fields, identifier, fingerprint, MAX_JSON_BYTES, wire_json
 from .engine import effective
 
 
@@ -51,32 +51,70 @@ def feasibility(model, constraints):
     return {"feasible": not missing and not present, "missing_required": [list(x) for x in missing], "present_forbidden": [list(x) for x in present], "allowed_count": len(allowed), "scope": "declared finite requests only", "constraints": fingerprint(normalized)}
 
 
-def propose(model, constraints, max_candidates=65536):
+def propose(model, constraints, max_candidates=65536, *, max_report_bytes=MAX_JSON_BYTES):
     if type(max_candidates) is not int or max_candidates < 0:
         raise ModelError("max_candidates must be nonnegative integer")
+    if max_report_bytes is not None and (type(max_report_bytes) is not int or max_report_bytes <= 0):
+        raise ModelError("max_report_bytes must be a positive integer or None for explicit unbounded SDK output")
     required, forbidden, edits, normalized = parse_constraints(model, constraints)
     keys = sorted(edits)
+    total = 2 ** len(keys)
+    model_hash, constraints_hash = model.digest, fingerprint(normalized)
+    def envelope(cost, complete, checked, termination):
+        return {"status": "OPTIMAL" if complete and cost is not None else "INFEASIBLE" if complete else "UNKNOWN", "complete": complete, "checked": checked, "candidate_count": total, "model": model_hash, "constraints": constraints_hash, "cost": cost, "selected": None, "alternatives": [], "ties_complete": complete, "lower_bound": cost if complete and cost is not None else 0, "scope": "minimum over declared unprotected deletion subsets", "termination": termination}
+    if max_report_bytes is not None and len(wire_json(envelope(None, False, total, "MAX_REPORT_BYTES"))) > max_report_bytes:
+        raise ModelError("report byte budget cannot fit the required result envelope")
+    key_bytes = {key: len(wire_json(key)) - 1 for key in keys}
     best_cost, best = None, []
+    best_bytes = 0
     checked = 0
     complete = True
+    termination = "COMPLETE"
     for size in range(len(keys) + 1):
         for subset in combinations(keys, size):
             if checked >= max_candidates:
                 complete = False
+                termination = "MAX_CANDIDATES"
                 break
             checked += 1
             candidate = model.remove(subset)
             allowed = effective(candidate)  # full re-evaluation: removals can create ALLOW
             if required <= allowed and not forbidden & allowed:
                 cost = sum(edits[k] for k in subset)
-                if best_cost is None or cost < best_cost:
-                    best_cost, best = cost, [list(subset)]
-                elif cost == best_cost:
-                    best.append(list(subset))
+                if best_cost is None or cost <= best_cost:
+                    lower = best_cost is None or cost < best_cost
+                    subset_bytes = 2 + sum(key_bytes[k] for k in subset) + 2 * max(len(subset) - 1, 0)
+                    byte_sum = subset_bytes if lower else best_bytes + subset_bytes
+                    count = 1 if lower else len(best) + 1
+                    if max_report_bytes is not None:
+                        # Reserve the largest incomplete metadata (including
+                        # final checked/cost digits). If this is the last
+                        # candidate, use the exact complete envelope instead.
+                        last = checked == total
+                        shell = envelope(cost, last, total, "COMPLETE" if last else "MAX_REPORT_BYTES")
+                        if not last:
+                            shell["lower_bound"] = cost  # sizing only, never emitted as an UNKNOWN proof
+                        # Replace selected:null and alternatives:[] by their
+                        # incremental JSON lengths. Selection order does not
+                        # change the sum of encoded subset lengths.
+                        projected = len(wire_json(shell)) - 4 + byte_sum + 2 * max(count - 2, 0)
+                        if projected > max_report_bytes:
+                            complete = False
+                            termination = "MAX_REPORT_BYTES"
+                            break
+                    if lower:
+                        best_cost, best = cost, [list(subset)]
+                    else:
+                        best.append(list(subset))
+                    best_bytes = byte_sum
         if not complete:
             break
     best.sort()
-    return {"status": "OPTIMAL" if complete and best else "INFEASIBLE" if complete else "UNKNOWN", "complete": complete, "checked": checked, "candidate_count": 2 ** len(keys), "model": model.digest, "constraints": fingerprint(normalized), "cost": best_cost, "selected": best[0] if best else None, "alternatives": best[1:], "ties_complete": complete, "lower_bound": best_cost if complete and best else 0, "scope": "minimum over declared unprotected deletion subsets"}
+    result = envelope(best_cost, complete, checked, termination)
+    result.update(selected=best[0] if best else None, alternatives=best[1:])
+    if max_report_bytes is not None and len(wire_json(result)) > max_report_bytes:
+        raise ModelError("report byte accounting exceeded its declared budget")
+    return result
 
 
 def apply(model, constraints, proposal):
@@ -93,7 +131,7 @@ def apply(model, constraints, proposal):
 
 def validate_proposal(model, constraints, proposal):
     """Strict wire structure and source binding, without trusting optimization claims."""
-    fields(proposal, ("status", "complete", "checked", "candidate_count", "model", "constraints", "cost", "selected", "alternatives", "ties_complete", "lower_bound", "scope"))
+    fields(proposal, ("status", "complete", "checked", "candidate_count", "model", "constraints", "cost", "selected", "alternatives", "ties_complete", "lower_bound", "scope"), ("termination",))
     required, forbidden, edits, normalized = parse_constraints(model, constraints)
     if proposal.get("model") != model.digest or proposal.get("constraints") != fingerprint(normalized):
         raise ModelError("proposal binding differs from model or constraints")
@@ -101,6 +139,8 @@ def validate_proposal(model, constraints, proposal):
         raise ModelError("invalid proposal status/completeness")
     if proposal["complete"] != (proposal["status"] != "UNKNOWN") or proposal["ties_complete"] != proposal["complete"]:
         raise ModelError("inconsistent proposal status/completeness")
+    if "termination" in proposal and (proposal["termination"] not in ("COMPLETE", "MAX_CANDIDATES", "MAX_REPORT_BYTES") or (proposal["termination"] == "COMPLETE") != proposal["complete"]):
+        raise ModelError("inconsistent proposal termination/completeness")
     total = 2 ** len(edits)
     if type(proposal["candidate_count"]) is not int or proposal["candidate_count"] != total or type(proposal["checked"]) is not int or not 0 <= proposal["checked"] <= total:
         raise ModelError("invalid candidate accounting")

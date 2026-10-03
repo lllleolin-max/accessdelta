@@ -6,6 +6,13 @@ from itertools import product
 import hashlib
 import json
 
+MAX_JSON_BYTES = 4 * 1024 * 1024
+
+
+def wire_json(value):
+    """Exact ASCII-safe JSON protocol bytes, including one LF on every platform."""
+    return (json.dumps(value, ensure_ascii=True, sort_keys=True) + "\n").encode("ascii")
+
 
 class ModelError(ValueError):
     """Malformed data or references."""
