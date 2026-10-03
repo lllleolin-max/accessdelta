@@ -1,7 +1,7 @@
 """Independent small-instance oracle: Boolean closure, bitmasks, no engine calls."""
 from itertools import product
 from .model import ModelError, fingerprint
-from .repair import parse_constraints
+from .repair import parse_constraints, validate_proposal
 
 
 def allowed_by_closure(model, deleted=()):
@@ -47,6 +47,10 @@ def certify(model, constraints, proposal):
     if not isinstance(proposal, dict):
         raise ModelError("proposal must be an object")
     oracle = exhaustive_oracle(model, constraints)
+    try:
+        validate_proposal(model, constraints, proposal)
+    except ModelError as exc:
+        return {"certified": False, "oracle": oracle, "error": str(exc), "scope": "invalid source-bound finite proposal"}
     claimed = [proposal["selected"]] + proposal["alternatives"] if proposal.get("selected") is not None else []
     bound = proposal.get("model") == model.digest and proposal.get("constraints") == fingerprint(normalized)
     valid = bound and proposal.get("complete") is True and proposal.get("ties_complete") is True and proposal.get("status") == oracle["status"] and proposal.get("cost") == oracle["cost"] and claimed == oracle["solutions"]

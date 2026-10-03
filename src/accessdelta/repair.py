@@ -79,21 +79,54 @@ def propose(model, constraints, max_candidates=65536):
 
 
 def apply(model, constraints, proposal):
-    _, _, edits, normalized = parse_constraints(model, constraints)
-    if proposal.get("model") != model.digest or proposal.get("constraints") != fingerprint(normalized):
-        raise ModelError("proposal binding differs from model or constraints")
-    selected = proposal.get("selected")
-    if not isinstance(selected, list) or len(selected) != len(set(selected)) or not all(k in edits for k in selected):
-        raise ModelError("proposal must select unique editable unprotected items")
-    if proposal.get("cost") != sum(edits[k] for k in selected):
-        raise ModelError("proposal cost differs from exact declared cost")
+    required, forbidden, edits, normalized = validate_proposal(model, constraints, proposal)
+    selected = proposal["selected"]
+    if selected is None:
+        raise ModelError("proposal contains no feasible incumbent")
     repaired = model.remove(selected)
-    # Constraint references are for the source model, so evaluate directly after deletion.
-    required, forbidden, _, _ = parse_constraints(model, constraints)
     allowed = effective(repaired)
     if not required <= allowed or forbidden & allowed:
         raise ModelError("selected edits fail complete finite feasibility recheck")
     return repaired
+
+
+def validate_proposal(model, constraints, proposal):
+    """Strict wire structure and source binding, without trusting optimization claims."""
+    fields(proposal, ("status", "complete", "checked", "candidate_count", "model", "constraints", "cost", "selected", "alternatives", "ties_complete", "lower_bound", "scope"))
+    required, forbidden, edits, normalized = parse_constraints(model, constraints)
+    if proposal.get("model") != model.digest or proposal.get("constraints") != fingerprint(normalized):
+        raise ModelError("proposal binding differs from model or constraints")
+    if proposal["status"] not in ("OPTIMAL", "INFEASIBLE", "UNKNOWN") or type(proposal["complete"]) is not bool or type(proposal["ties_complete"]) is not bool:
+        raise ModelError("invalid proposal status/completeness")
+    if proposal["complete"] != (proposal["status"] != "UNKNOWN") or proposal["ties_complete"] != proposal["complete"]:
+        raise ModelError("inconsistent proposal status/completeness")
+    total = 2 ** len(edits)
+    if type(proposal["candidate_count"]) is not int or proposal["candidate_count"] != total or type(proposal["checked"]) is not int or not 0 <= proposal["checked"] <= total:
+        raise ModelError("invalid candidate accounting")
+    if proposal["complete"] and proposal["checked"] != total:
+        raise ModelError("complete proposal did not account for every candidate")
+    selected, alternatives, cost = proposal["selected"], proposal["alternatives"], proposal["cost"]
+    if not isinstance(alternatives, list):
+        raise ModelError("alternatives must be a list")
+    if selected is None:
+        if cost is not None or alternatives or proposal["status"] == "OPTIMAL":
+            raise ModelError("no-incumbent proposal has inconsistent result fields")
+    else:
+        if type(cost) is not int or cost < 0 or proposal["status"] == "INFEASIBLE":
+            raise ModelError("incumbent cost must be exact nonnegative integer")
+        all_subsets = [selected] + alternatives
+        seen = set()
+        for subset in all_subsets:
+            if not isinstance(subset, list) or not all(isinstance(k, str) and k in edits for k in subset) or len(subset) != len(set(subset)):
+                raise ModelError("proposal must select unique editable unprotected items")
+            identity = tuple(sorted(subset))
+            if identity in seen or sum(edits[k] for k in subset) != cost:
+                raise ModelError("duplicate alternative or incorrect declared cost")
+            seen.add(identity)
+    lower = proposal["lower_bound"]
+    if type(lower) is not int or lower < 0 or (cost is not None and lower > cost):
+        raise ModelError("invalid finite lower bound")
+    return required, forbidden, edits, normalized
 
 
 def check(source, constraints, proposal, repaired):

@@ -7,7 +7,23 @@ from . import Model, ModelError, UnsupportedModel, compare, explain, propose, ap
 
 
 def read(path):
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    def unique_object(pairs):
+        obj = {}
+        for key, value in pairs:
+            if key in obj:
+                raise ModelError(f"duplicate JSON object key: {key}")
+            obj[key] = value
+        return obj
+    def no_constant(value):
+        raise ModelError(f"nonfinite JSON constant: {value}")
+    with Path(path).open("rb") as stream:
+        data = stream.read(4 * 1024 * 1024 + 1)
+    if len(data) > 4 * 1024 * 1024:
+        raise ModelError("JSON input exceeds 4 MiB")
+    try:
+        return json.loads(data.decode("utf-8-sig"), object_pairs_hook=unique_object, parse_constant=no_constant)
+    except (UnicodeError, ValueError, RecursionError) as exc:
+        raise ModelError(f"invalid UTF-8 JSON: {exc}") from exc
 
 
 def load(path):

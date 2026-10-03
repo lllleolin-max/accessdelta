@@ -29,7 +29,7 @@ def fields(value, required, optional=()):
 
 
 def identifier(value):
-    if not isinstance(value, str) or not value or len(value) > 160 or any(ord(c) < 32 for c in value):
+    if not isinstance(value, str) or not value or len(value) > 160 or not value.isprintable() or any(0xD800 <= ord(c) <= 0xDFFF for c in value):
         raise ModelError("identifiers must be nonempty strings of at most 160 printable characters")
     if any(c in value for c in "*?["):
         raise UnsupportedModel("wildcard syntax is unsupported; enumerate exact identifiers")
@@ -82,7 +82,7 @@ class Model:
     @classmethod
     def from_dict(cls, data):
         fields(data, ("version", "principals", "roles", "actions", "resources", "memberships", "inheritance", "grants"))
-        if data["version"] != 1:
+        if type(data["version"]) is not int or data["version"] != 1:
             raise UnsupportedModel("only internal model version 1 is supported")
         p, r, a, s = (names(data[k]) for k in ("principals", "roles", "actions", "resources"))
         if len(p) * len(a) * len(s) > 25000:
@@ -117,7 +117,7 @@ class Model:
                     aa, ss = names(item["actions"]), names(item["resources"])
                     if not set(aa) <= set(a) or not set(ss) <= set(s):
                         raise ModelError("unknown grant action/resource")
-                    if item.get("conditions"):
+                    if "conditions" in item and item["conditions"] != {}:
                         raise UnsupportedModel("conditions are unsupported; remove them only after explicit model review")
                     parsed[key].append(Grant(ident, kind, subject, item["effect"], aa, ss))
         # Kahn's algorithm rejects cycles, including unreachable ones, without recursion.
