@@ -52,6 +52,8 @@ def verify(revision, probe=None):
                     raise RuntimeError(f"Git/archive/wheel/site byte mismatch: {relative}")
                 hashes[relative] = values[0]
         report = {"revision": sha, "python": sys.version, "archive_sha256": digest(archive.read_bytes()), "wheel_sha256": digest(wheel.read_bytes()), "module_hashes": hashes, "installed_module": str(site), "build": build, "install": install, "suite": run([python, "-m", "unittest", "discover", "-s", "tests", "-v"], source), "demo": run([python, "scripts/demo.py"], source), "contrast": run([python, "scripts/contrast.py"], source)}
+        if (source / "scripts/run_probes.py").exists():
+            report["frozen_probes"] = run([python, "scripts/run_probes.py"], source)
         if probe:
             probe = Path(probe).resolve()
             report["probe"] = {"file": str(probe.relative_to(ROOT)), "sha256": digest(probe.read_bytes()), "result": run([python, probe], source)}

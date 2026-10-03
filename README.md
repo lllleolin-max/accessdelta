@@ -15,6 +15,7 @@ python -m pip install .
 python scripts/demo.py
 python scripts/contrast.py
 python -m unittest discover -s tests -v
+python scripts/run_probes.py
 ```
 
 `demo.py` discovers the **installed, registered** `accessdelta` entry point through `sysconfig.get_path('scripts')`, then actually compares, inspects, proposes, applies into a new temporary local JSON, rechecks it, and independently certifies the small optimum. It prints each machine-readable result. Installation is ordinary wheel installation; no `PYTHONPATH` or source import injection.
@@ -70,9 +71,10 @@ AWS already provides [custom checks for new access](https://docs.aws.amazon.com/
 
 ## Bounds and honest outcomes / 边界
 
-- Exact enumerated identifiers only. No wildcard or nonempty condition semantics, cloud IAM language, sessions, groups, resource policies, dynamic attributes, external identity discovery or real-account guarantees.
+- Exact enumerated identifiers only. Conditions must be omitted or `{}`; all other values return UNKNOWN. No wildcard semantics, cloud IAM language, sessions, groups, resource policies, dynamic attributes, external identity discovery or real-account guarantees.
 - Explicit DENY wins; otherwise any applicable ALLOW wins; otherwise default DENY. Child-role inheritance flows toward its named `inherits` parent. All cycles and unknown references are invalid, even when unreachable.
 - Request universe: Cartesian product of supplied principals/actions/resources, at most 25,000 triples. Each declared list has at most 1,000 items. Comparison requires the same request universe on both sides.
+- CLI JSON inputs are UTF-8 (optional BOM), at most 4 MiB each. Duplicate object keys, nonfinite constants, bad encoding and unpaired Unicode surrogates are rejected.
 - Editable universe: at most 20 declared grant/membership/inheritance deletions with exact nonnegative integer costs; protected items cannot be deleted. Constraints apply to **every** declared forbidden request, including access created by removal. Required access must be effective afterward.
 - Enumeration stops at `max_candidates` (default 65,536). Exhaustion returns **UNKNOWN**, with a feasible incumbent when found, lower bound 0 and incomplete alternatives. Only complete enumeration returns OPTIMAL or INFEASIBLE. A valid incumbent can be applied and checked without proving optimality.
 - All minimum-cost subsets are reported in deterministic lexical order. Zero-cost redundant edits remain legitimate tied solutions; selected is a presentation choice, never a uniqueness claim.

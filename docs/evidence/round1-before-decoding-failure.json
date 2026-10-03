@@ -1,0 +1,87 @@
+{
+  "revision": "e445bbc72b3b6b8f6e428f7b834d24d6fbba5168",
+  "python": "3.14.3 (tags/v3.14.3:323c59a, Feb  3 2026, 16:04:56) [MSC v.1944 64 bit (AMD64)]",
+  "archive_sha256": "fc5513f5704a79080586593cc4b1c045015a1be38a3dd7389a13deb031693fc2",
+  "wheel_sha256": "67a92f1ca625f7aa0419bc94be520aa87105a988d534b83d71760547cc0778ac",
+  "module_hashes": {
+    "src/accessdelta/__init__.py": "d07738ed47b0bccbfd95d86a8a1395e4001fe517b50eec173e986890bef6d8cb",
+    "src/accessdelta/cli.py": "f8de0b18e943b718a2e3b6777406a92d1ae6e47d88ca5a2bb2104ff82167f6a9",
+    "src/accessdelta/engine.py": "419b99fef03fef183ae36ef4036d827e24e062cd8809ff2f5063c0669851a1b2",
+    "src/accessdelta/model.py": "65347ff0d0603810f0f7ed2dc16bf944c275935dcb7c60c14e6d9287df95073e",
+    "src/accessdelta/oracle.py": "eff51979b02f0812a54b8b7e228fafc1b3509090bf8366b30b24e6c15735884a",
+    "src/accessdelta/repair.py": "4509339846dd4eaa25e87d36d7aa39bbc274309eb7522614d5095450c99ae143"
+  },
+  "installed_module": "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\env\\Lib\\site-packages\\accessdelta",
+  "build": {
+    "command": [
+      "C:\\Users\\34178\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "-m",
+      "pip",
+      "wheel",
+      "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\source",
+      "--no-deps",
+      "-w",
+      "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\wheels"
+    ],
+    "returncode": 0,
+    "stdout": "Processing c:\\users\\34178\\appdata\\local\\temp\\accessdelta-audit-ivxw1yoa\\source\n  Installing build dependencies: started\n  Installing build dependencies: finished with status 'done'\n  Getting requirements to build wheel: started\n  Getting requirements to build wheel: finished with status 'done'\n  Preparing metadata (pyproject.toml): started\n  Preparing metadata (pyproject.toml): finished with status 'done'\nBuilding wheels for collected packages: accessdelta\n  Building wheel for accessdelta (pyproject.toml): started\n  Building wheel for accessdelta (pyproject.toml): finished with status 'done'\n  Created wheel for accessdelta: filename=accessdelta-0.1.0-py3-none-any.whl size=10647 sha256=67a92f1ca625f7aa0419bc94be520aa87105a988d534b83d71760547cc0778ac\n  Stored in directory: C:\\Users\\34178\\AppData\\Local\\Temp\\pip-ephem-wheel-cache-ug3mf_9r\\wheels\\9f\\ff\\7c\\18844a54b9a7a592c32ca7a6fbd6f556c71f29939cca3c7799\nSuccessfully built accessdelta\n",
+    "stderr": "\n[notice] A new release of pip is available: 25.3 -> 26.2.1\n[notice] To update, run: C:\\Users\\34178\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe -m pip install --upgrade pip\n"
+  },
+  "install": {
+    "command": [
+      "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\env\\Scripts\\python.exe",
+      "-m",
+      "pip",
+      "install",
+      "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\wheels\\accessdelta-0.1.0-py3-none-any.whl"
+    ],
+    "returncode": 0,
+    "stdout": "Processing c:\\users\\34178\\appdata\\local\\temp\\accessdelta-audit-ivxw1yoa\\wheels\\accessdelta-0.1.0-py3-none-any.whl\nInstalling collected packages: accessdelta\nSuccessfully installed accessdelta-0.1.0\n",
+    "stderr": "\n[notice] A new release of pip is available: 25.3 -> 26.2.1\n[notice] To update, run: C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\env\\Scripts\\python.exe -m pip install --upgrade pip\n"
+  },
+  "suite": {
+    "command": [
+      "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\env\\Scripts\\python.exe",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-v"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "test_compare_full_models (test_accessdelta.AuthorizationTests.test_compare_full_models) ... ok\ntest_cycle_and_unknown_references (test_accessdelta.AuthorizationTests.test_cycle_and_unknown_references) ... ok\ntest_default_and_direct_deny (test_accessdelta.AuthorizationTests.test_default_and_direct_deny) ... ok\ntest_deny_diamond (test_accessdelta.AuthorizationTests.test_deny_diamond) ... ok\ntest_empty_universe (test_accessdelta.AuthorizationTests.test_empty_universe) ... ok\ntest_nonmonotone_member_and_edge_deletion (test_accessdelta.AuthorizationTests.test_nonmonotone_member_and_edge_deletion) ... ok\ntest_permutation_invariance (test_accessdelta.AuthorizationTests.test_permutation_invariance) ... ok\ntest_unknown_inspection_universe (test_accessdelta.AuthorizationTests.test_unknown_inspection_universe) ... ok\ntest_unsupported_conditions_and_wildcards (test_accessdelta.AuthorizationTests.test_unsupported_conditions_and_wildcards) ... ok\ntest_bound_without_and_with_incumbent (test_accessdelta.RepairTests.test_bound_without_and_with_incumbent) ... ok\ntest_exact_integer_and_request_constraints (test_accessdelta.RepairTests.test_exact_integer_and_request_constraints) ... ok\ntest_protected_impossible (test_accessdelta.RepairTests.test_protected_impossible) ... ok\ntest_protected_required_cannot_break (test_accessdelta.RepairTests.test_protected_required_cannot_break) ... ok\ntest_random_dags_independent_oracle (test_accessdelta.RepairTests.test_random_dags_independent_oracle) ... ok\ntest_tampered_cost_binding_and_model (test_accessdelta.RepairTests.test_tampered_cost_binding_and_model) ... ok\ntest_ties_zero_cost (test_accessdelta.RepairTests.test_ties_zero_cost) ... ok\n\n----------------------------------------------------------------------\nRan 16 tests in 0.067s\n\nOK\n"
+  },
+  "demo": {
+    "command": [
+      "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\env\\Scripts\\python.exe",
+      "scripts/demo.py"
+    ],
+    "returncode": 0,
+    "stdout": "{\n  \"registered_cli\": \"C:\\\\Users\\\\34178\\\\AppData\\\\Local\\\\Temp\\\\accessdelta-audit-ivxw1yoa\\\\env\\\\Scripts\\\\accessdelta.exe\",\n  \"delta\": {\n    \"added\": [\n      {\n        \"decision\": \"ALLOW\",\n        \"evidence\": [\n          {\n            \"effect\": \"ALLOW\",\n            \"grant\": \"bad-write\",\n            \"path\": [\n              \"principal:alice\",\n              \"membership:entry-member\",\n              \"role:entry\",\n              \"inheritance:deny-edge\",\n              \"role:deny-branch\",\n              \"grant:bad-write\"\n            ]\n          }\n        ],\n        \"reason\": \"MATCHED_ALLOW\",\n        \"request\": [\n          \"alice\",\n          \"write\",\n          \"deploy\"\n        ]\n      }\n    ],\n    \"after\": \"ff2065f3d32c038569d00691159ac828b78ec42db650ca5f9f3c278c04d380d3\",\n    \"before\": \"6c5f85f0742859df907488029fb50a6e95ce56f2260bb67e647961ac690a3dae\",\n    \"removed\": [],\n    \"retained_count\": 1,\n    \"universe_size\": 6\n  },\n  \"secret_evidence\": {\n    \"decision\": \"DENY\",\n    \"evidence\": [\n      {\n        \"effect\": \"ALLOW\",\n        \"grant\": \"alternate-secret\",\n        \"path\": [\n          \"principal:alice\",\n          \"grant:alternate-secret\"\n        ]\n      },\n      {\n        \"effect\": \"ALLOW\",\n        \"grant\": \"common-secret\",\n        \"path\": [\n          \"principal:alice\",\n          \"membership:entry-member\",\n          \"role:entry\",\n          \"inheritance:allow-edge\",\n          \"role:allow-branch\",\n          \"inheritance:allow-common\",\n          \"role:common\",\n          \"grant:common-secret\"\n        ]\n      },\n      {\n        \"effect\": \"DENY\",\n        \"grant\": \"deny-secret\",\n        \"path\": [\n          \"principal:alice\",\n          \"membership:entry-member\",\n          \"role:entry\",\n          \"inheritance:deny-edge\",\n          \"role:deny-branch\",\n          \"grant:deny-secret\"\n        ]\n      }\n    ],\n    \"reason\": \"EXPLICIT_DENY\",\n    \"request\": [\n      \"alice\",\n      \"read\",\n      \"secret\"\n    ]\n  },\n  \"proposal\": {\n    \"alternatives\": [],\n    \"candidate_count\": 8,\n    \"checked\": 8,\n    \"complete\": true,\n    \"constraints\": \"9bf3e38e0bd173c5d7d6cd0317f3c7f7b10cc603b56899722b16bdfb3153a7e6\",\n    \"cost\": 4,\n    \"lower_bound\": 4,\n    \"model\": \"ff2065f3d32c038569d00691159ac828b78ec42db650ca5f9f3c278c04d380d3\",\n    \"scope\": \"minimum over declared unprotected deletion subsets\",\n    \"selected\": [\n      \"grant:bad-write\"\n    ],\n    \"status\": \"OPTIMAL\",\n    \"ties_complete\": true\n  },\n  \"apply\": {\n    \"model\": \"6c5f85f0742859df907488029fb50a6e95ce56f2260bb67e647961ac690a3dae\",\n    \"scope\": \"new local JSON only\",\n    \"written\": \"C:\\\\Users\\\\34178\\\\AppData\\\\Local\\\\Temp\\\\accessdelta-demo-icse05ug\\\\repaired.json\"\n  },\n  \"check\": {\n    \"cost\": 4,\n    \"feasible\": true,\n    \"repaired\": \"6c5f85f0742859df907488029fb50a6e95ce56f2260bb67e647961ac690a3dae\",\n    \"scope\": \"source-bound feasibility only; does not certify optimality or external permissions\"\n  },\n  \"certify\": {\n    \"certified\": true,\n    \"oracle\": {\n      \"checked\": 8,\n      \"cost\": 4,\n      \"solutions\": [\n        [\n          \"grant:bad-write\"\n        ]\n      ],\n      \"status\": \"OPTIMAL\"\n    },\n    \"scope\": \"independent finite deletion optimum only; not cloud or outside-universe safety\"\n  }\n}\n",
+    "stderr": ""
+  },
+  "contrast": {
+    "command": [
+      "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\env\\Scripts\\python.exe",
+      "scripts/contrast.py"
+    ],
+    "returncode": 0,
+    "stdout": "{\n  \"cases\": [\n    {\n      \"case\": \"cost-trap\",\n      \"synthetic\": true,\n      \"raw_changed_grants\": [],\n      \"effective_added\": [\n        [\n          \"alice\",\n          \"read\",\n          \"secret\"\n        ],\n        [\n          \"alice\",\n          \"write\",\n          \"deploy\"\n        ]\n      ],\n      \"greedy\": {\n        \"status\": \"FEASIBLE\",\n        \"selected\": [\n          \"grant:deploy-write\",\n          \"grant:secret-read\"\n        ],\n        \"cost\": 4,\n        \"feasible\": true\n      },\n      \"exact\": {\n        \"status\": \"OPTIMAL\",\n        \"cost\": 3,\n        \"selected\": [\n          \"inheritance:write-edge\"\n        ],\n        \"alternatives\": [],\n        \"checked\": 16\n      }\n    },\n    {\n      \"case\": \"deny-diamond\",\n      \"synthetic\": true,\n      \"raw_changed_grants\": [\n        \"bad-write\"\n      ],\n      \"effective_added\": [\n        [\n          \"alice\",\n          \"write\",\n          \"deploy\"\n        ]\n      ],\n      \"greedy\": {\n        \"status\": \"FEASIBLE\",\n        \"selected\": [\n          \"grant:bad-write\"\n        ],\n        \"cost\": 4,\n        \"feasible\": true\n      },\n      \"exact\": {\n        \"status\": \"OPTIMAL\",\n        \"cost\": 4,\n        \"selected\": [\n          \"grant:bad-write\"\n        ],\n        \"alternatives\": [],\n        \"checked\": 8\n      }\n    },\n    {\n      \"case\": \"simple\",\n      \"synthetic\": true,\n      \"raw_changed_grants\": [\n        \"unwanted\"\n      ],\n      \"effective_added\": [\n        [\n          \"alice\",\n          \"write\",\n          \"deploy\"\n        ]\n      ],\n      \"greedy\": {\n        \"status\": \"FEASIBLE\",\n        \"selected\": [\n          \"grant:unwanted\"\n        ],\n        \"cost\": 2,\n        \"feasible\": true\n      },\n      \"exact\": {\n        \"status\": \"OPTIMAL\",\n        \"cost\": 2,\n        \"selected\": [\n          \"grant:unwanted\"\n        ],\n        \"alternatives\": [],\n        \"checked\": 2\n      }\n    },\n    {\n      \"case\": \"ties\",\n      \"synthetic\": true,\n      \"raw_changed_grants\": [],\n      \"effective_added\": [\n        [\n          \"alice\",\n          \"write\",\n          \"deploy\"\n        ]\n      ],\n      \"greedy\": {\n        \"status\": \"FEASIBLE\",\n        \"selected\": [\n          \"membership:join\"\n        ],\n        \"cost\": 2,\n        \"feasible\": true\n      },\n      \"exact\": {\n        \"status\": \"OPTIMAL\",\n        \"cost\": 2,\n        \"selected\": [\n          \"grant:irrelevant\",\n          \"grant:one\",\n          \"grant:two\"\n        ],\n        \"alternatives\": [\n          [\n            \"grant:irrelevant\",\n            \"membership:join\"\n          ],\n          [\n            \"grant:one\",\n            \"grant:two\"\n          ],\n          [\n            \"membership:join\"\n          ]\n        ],\n        \"checked\": 16\n      }\n    }\n  ],\n  \"competitor_benchmark\": false\n}\n",
+    "stderr": ""
+  },
+  "probe": {
+    "file": "tests\\probes\\certificate_binding.py",
+    "sha256": "632a705c4045d498a48c740f3c2d64d5b9a98397337b9192ab9a85f6d018a109",
+    "result": {
+      "command": [
+        "C:\\Users\\34178\\AppData\\Local\\Temp\\accessdelta-audit-ivxw1yoa\\env\\Scripts\\python.exe",
+        "D:\\coding 总览\\GitHub水王\\work\\ten-projects\\accessdelta\\tests\\probes\\certificate_binding.py"
+      ],
+      "returncode": 1,
+      "stdout": "{\"checks\": [{\"tampered\": \"model\", \"certified\": true}, {\"tampered\": \"constraints\", \"certified\": true}, {\"tampered\": \"ties_complete\", \"certified\": true}], \"pass\": false}\n",
+      "stderr": null
+    }
+  }
+}
