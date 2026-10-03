@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import sys
 from . import Model, ModelError, UnsupportedModel, compare, explain, propose, apply, check, certify
-from .model import MAX_JSON_BYTES, canonical, wire_json, json_integer
+from .model import MAX_JSON_BYTES, canonical, wire_json, json_integer, JSONIntegerLimit
 
 
 def emit(value, file=None):
@@ -108,6 +108,9 @@ def main(argv=None):
         if result.get("status") == "INFEASIBLE" or result.get("certified") is False:
             return 4
         return 0
+    except JSONIntegerLimit as exc:
+        emit({"status": "UNKNOWN", "complete": False, "termination": "MAX_INTEGER_DIGITS", "error": str(exc), "scope": "bounded JSON output interoperability only"}, sys.stderr)
+        return 3
     except UnsupportedModel as exc:
         emit({"status": "UNKNOWN", "error": str(exc)}, sys.stderr)
         return 3

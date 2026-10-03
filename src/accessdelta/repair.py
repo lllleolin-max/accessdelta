@@ -64,7 +64,7 @@ def propose(model, constraints, max_candidates=65536, *, max_report_bytes=MAX_JS
     model_hash, constraints_hash = model.digest, fingerprint(normalized)
     def envelope(cost, complete, checked, termination):
         return {"status": "OPTIMAL" if complete and cost is not None else "INFEASIBLE" if complete else "UNKNOWN", "complete": complete, "checked": checked, "candidate_count": total, "model": model_hash, "constraints": constraints_hash, "cost": cost, "selected": None, "alternatives": [], "ties_complete": complete, "lower_bound": cost if complete and cost is not None else 0, "scope": "minimum over declared unprotected deletion subsets", "termination": termination}
-    if max_report_bytes is not None and len(wire_json(envelope(None, False, total, "MAX_REPORT_BYTES"))) > max_report_bytes:
+    if max_report_bytes is not None and len(wire_json(envelope(None, False, total, "MAX_INTEGER_DIGITS"))) > max_report_bytes:
         raise ModelError("report byte budget cannot fit the required result envelope")
     key_bytes = {key: len(wire_json(key)) - 1 for key in keys}
     best_cost, best = None, []

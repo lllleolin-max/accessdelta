@@ -24,6 +24,10 @@ class UnsupportedModel(ModelError):
     """Input asks for semantics outside this finite language."""
 
 
+class JSONIntegerLimit(ModelError):
+    """Exact result cannot fit the bounded JSON integer interoperability limit."""
+
+
 def canonical(value):
     return _json_text(value, ensure_ascii=False, compact=True)
 
@@ -46,7 +50,7 @@ def integer_fits_wire(value):
 
 def _integer_text(value):
     if not integer_fits_wire(value):
-        raise ModelError("JSON integer exceeds 4300 decimal digits")
+        raise JSONIntegerLimit("JSON integer exceeds 4300 decimal digits")
     chunks = []
     remaining = abs(value)
     while remaining >= 1000000000:

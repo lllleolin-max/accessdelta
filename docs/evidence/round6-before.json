@@ -1,0 +1,137 @@
+{
+  "commit": "9c19656cf00500e03654a56f4fd57b059c0df5ac",
+  "source_tree": "e7c33c5dd0e86146ea475c1bd4ad3949388007ca",
+  "version": "0.1.1",
+  "ordinary_install": true,
+  "canonical_archive_wheel_installed_modules": [
+    {
+      "file": "__init__.py",
+      "sha256": "d07738ed47b0bccbfd95d86a8a1395e4001fe517b50eec173e986890bef6d8cb"
+    },
+    {
+      "file": "cli.py",
+      "sha256": "755d2698f58eefdc941743fcaf33d969a06a0370223233fedccff039777ba803"
+    },
+    {
+      "file": "engine.py",
+      "sha256": "0dc860760079cf26f684721d04b66e2f876d20efccb17b3509566ebd8b402ca3"
+    },
+    {
+      "file": "model.py",
+      "sha256": "d6dac051a389634c83883f94ecccd5562bd6cd9ac5cd05f77fee9a468883fa4c"
+    },
+    {
+      "file": "oracle.py",
+      "sha256": "c0dd2c6cd05017b3bda3835e0152e9a81e9c7e9421ffc7233a058306d7e622ed"
+    },
+    {
+      "file": "repair.py",
+      "sha256": "88b34993b6b66ecca828078f7c7fd0fd10a7dd5be39b43f29a47c62e66dfb6ca"
+    }
+  ],
+  "archive_sha256": "14eb34310f598633726aa16f31cff411d6e788e8001356546c06d40aaad03e2c",
+  "wheel_sha256": "e670155f04c6bf8fd7d85694f5b26e080a37c6c9d895501bed8a5d543f3bf9a8",
+  "unchanged_probe_sha256": "7acfe203ebe0ce47acec70786871b124101e59e0634f278d62d611d143361fc1",
+  "probe_exit": 1,
+  "source_repository_configuration_unchanged": true,
+  "consumer": {
+    "version": "0.1.1",
+    "python_version": "3.14.3",
+    "int_max_str_digits_before_after": [
+      4300,
+      4300
+    ],
+    "registered_console": "target-interpreter sysconfig scripts",
+    "independent_oracle": "two independent ALLOWs require both deletions; exact integer sum, no production traversal or subset helpers",
+    "cases": [
+      {
+        "individual_cost_digits": 4299,
+        "sum_cost_digits": 4300,
+        "sum_matches_2_times_10_power_minus_2": true,
+        "candidate_count": 4,
+        "unique_feasible_subset": [
+          "grant:g1",
+          "grant:g2"
+        ],
+        "unbounded_sdk_exact_feasible": true,
+        "model_bytes": 377,
+        "constraints_bytes": 8775,
+        "bounded_sdk": {
+          "bounded_call": "returned",
+          "status": "OPTIMAL",
+          "complete": true,
+          "selected": [
+            "grant:g1",
+            "grant:g2"
+          ],
+          "cost_matches_oracle": true
+        },
+        "console": {
+          "operation": "propose",
+          "exit": 0,
+          "stdout_bytes": 9034,
+          "stderr_bytes": 0,
+          "traceback": false,
+          "json_valid": true,
+          "status": "OPTIMAL",
+          "complete": true,
+          "consumers": [
+            {
+              "operation": "apply",
+              "exit": 0,
+              "traceback": false
+            },
+            {
+              "operation": "check",
+              "exit": 0,
+              "traceback": false
+            }
+          ]
+        },
+        "source_hashes": {
+          "model.json": "c35c1727eb1f2cb1977e93a75d090f92cd955a1d224ae1a7b972730d168d771d",
+          "constraints.json": "36e8bc8fe0828044da4d0f558020c2497958543af59e1701d5b191d357f2a1b1"
+        },
+        "source_preserved": true,
+        "destination_allocated": true,
+        "passed": true
+      },
+      {
+        "individual_cost_digits": 4300,
+        "sum_cost_digits": 4301,
+        "sum_matches_2_times_10_power_minus_2": true,
+        "candidate_count": 4,
+        "unique_feasible_subset": [
+          "grant:g1",
+          "grant:g2"
+        ],
+        "unbounded_sdk_exact_feasible": true,
+        "model_bytes": 377,
+        "constraints_bytes": 8777,
+        "bounded_sdk": {
+          "bounded_call": "exception",
+          "type": "ValueError",
+          "is_model_error": false,
+          "message": "Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit"
+        },
+        "console": {
+          "operation": "propose",
+          "exit": 1,
+          "stdout_bytes": 0,
+          "stderr_bytes": 1880,
+          "traceback": true,
+          "json_valid": false
+        },
+        "source_hashes": {
+          "model.json": "c35c1727eb1f2cb1977e93a75d090f92cd955a1d224ae1a7b972730d168d771d",
+          "constraints.json": "dcb092d69564aa0fcc8065939a0802454de3fee441a61a47bd2ed82df09d2e2c"
+        },
+        "source_preserved": true,
+        "destination_allocated": false,
+        "passed": false
+      }
+    ],
+    "passed": false
+  },
+  "remote_actions": false
+}
