@@ -17,6 +17,18 @@ def fixture(name="deny-diamond"):
 
 
 class AuthorizationTests(unittest.TestCase):
+    def test_dense_aggregation_agrees_with_explanations(self):
+        model, _ = fixture()
+        allowed = effective(model)
+        self.assertEqual(allowed, allowed_by_closure(model))
+        self.assertEqual(allowed, frozenset(req for req in model.universe if explain(model, req)["decision"] == "ALLOW"))
+        for dimension in ("principals", "actions", "resources"):
+            data = {"version": 1, "principals": ["p"], "roles": [], "actions": ["a"], "resources": ["r"], "memberships": [], "inheritance": [], "grants": []}
+            data[dimension] = []
+            empty = Model.from_dict(data)
+            self.assertEqual(effective(empty), allowed_by_closure(empty))
+            self.assertEqual(effective(empty), frozenset())
+
     def test_strict_conditions_version_and_unicode(self):
         model, _ = fixture()
         for condition in ([], False, 0, "", None):
@@ -210,8 +222,10 @@ class RepairTests(unittest.TestCase):
                 data["grants"].append({"id": f"g{i}", "subject": {"kind": "role", "id": roles[i]}, "effect": rng.choice(["ALLOW", "DENY"]), "actions": [rng.choice(["read", "write"])], "resources": [rng.choice(["x", "y"])]})
             model = Model.from_dict(data)
             self.assertEqual(effective(model), allowed_by_closure(model))
-            edits = [{"kind": "grant", "id": g["id"], "cost": rng.randrange(4)} for g in data["grants"]] + [{"kind": "membership", "id": "m", "cost": rng.randrange(4)}]
-            rules = {"required": [], "forbidden": [["p", "write", "x"], ["p", "read", "y"]], "edits": edits, "protected": []}
+            edits = [{"kind": "grant", "id": g["id"], "cost": rng.randrange(4)} for g in data["grants"]] + [{"kind": "membership", "id": "m", "cost": rng.randrange(4)}] + [{"kind": "inheritance", "id": e["id"], "cost": rng.randrange(4)} for e in data["inheritance"][:2]]
+            required = [list(sorted(effective(model))[0])] if effective(model) and case % 2 else []
+            forbidden = [x for x in [["p", "write", "x"], ["p", "read", "y"]] if x not in required]
+            rules = {"required": required, "forbidden": forbidden, "edits": edits, "protected": []}
             exact, oracle = propose(model, rules), exhaustive_oracle(model, rules)
             self.assertEqual((exact["status"], exact["cost"], [exact["selected"]] + exact["alternatives"]), (oracle["status"], oracle["cost"], oracle["solutions"]))
 

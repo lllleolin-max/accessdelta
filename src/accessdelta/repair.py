@@ -6,13 +6,14 @@ from .engine import effective
 
 def parse_constraints(model, value):
     fields(value, ("required", "forbidden", "edits", "protected"))
+    universe = set(model.universe)
     sets = []
     for name in ("required", "forbidden"):
-        if not isinstance(value[name], list):
-            raise ModelError(f"{name} must be a list")
+        if not isinstance(value[name], list) or len(value[name]) > 25000:
+            raise ModelError(f"{name} must be a list with at most 25000 requests")
         requests = []
         for req in value[name]:
-            if not isinstance(req, list) or len(req) != 3 or tuple(req) not in model.universe:
+            if not isinstance(req, list) or len(req) != 3 or not all(isinstance(x, str) for x in req) or tuple(req) not in universe:
                 raise ModelError(f"{name} request outside declared universe")
             requests.append(tuple(req))
         if len(requests) != len(set(requests)):

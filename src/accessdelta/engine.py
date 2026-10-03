@@ -1,5 +1,6 @@
 """Evaluate the complete finite model; an ALLOW path alone is never access."""
 from collections import deque
+from itertools import product
 from .model import ModelError
 
 
@@ -39,7 +40,21 @@ def explain(model, request):
 
 
 def effective(model):
-    return frozenset(request for request in model.universe if explain(model, request)["decision"] == "ALLOW")
+    # Default-denied requests need not be materialized. Reachability depends only
+    # on the principal, never on its action/resource, so traverse once per principal.
+    if not model.actions or not model.resources:
+        return frozenset()
+    result = set()
+    for principal in model.principals:
+        paths = role_paths(model, principal)
+        allow, deny = set(), set()
+        for grant in model.grants:
+            attached = (grant.kind == "principal" and grant.subject == principal) or (grant.kind == "role" and grant.subject in paths)
+            if attached:
+                target = allow if grant.effect == "ALLOW" else deny
+                target.update(product(grant.actions, grant.resources))
+        result.update((principal, action, resource) for action, resource in allow - deny)
+    return frozenset(result)
 
 
 def compare(before, after):
